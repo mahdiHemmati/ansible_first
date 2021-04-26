@@ -1,0 +1,16 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  
+  - name: run jmeter
+    shell: |
+          if [[ $(ps aux | grep jmeter | grep -v grep | awk '{print $2}') ]];
+          then
+          echo "kill last jmeter test";
+          kill -9 `ps aux | grep jmeter | grep -v grep | awk '{print $2}'`
+          fi
+          sh /home/mahdi/apache-jmeter-5.3/bin/jmeter -n -t sampad_http_request.jmx -j logs/jmeter.log -l logs/log.csv -Jtg.not={{ numberOfThread }} -Jtg.rup={{ rampUpPeriod }} -Jtg.lc={{ loopCounter }} -J{{ request }}=1 -Jurl={{ url }}
+    register: shell_result
+  - debug: var=shell_result.changed
